@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: videoservice-deployment
+  labels:
+    app: videoservice
+spec:
+  selector:
+    matchLabels:
+      app: videoservice
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: videoservice
+    spec:
+      imagePullSecrets:
+      - name: ghcr-access-key
+      containers:
+      - name: videoservice
+        image: ghcr.io/bszendro/videoservice/videoservice:latest
+        ports:
+        - name: video
+          containerPort: 8000
+        - name: prom-metrics
+          containerPort: 7000

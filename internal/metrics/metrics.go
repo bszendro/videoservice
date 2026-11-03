@@ -32,5 +32,5 @@ func NewMetricsServer(m *Metrics) *http.Server {
 
 	mux := http.NewServeMux()
 	mux.Handle("/metrics", promhttp.HandlerFor(reg, promhttp.HandlerOpts{}))
-	return &http.Server{Addr: "127.0.0.1:7000", Handler: mux, ReadHeaderTimeout: 10 * time.Second}
+	return &http.Server{Addr: ":7000", Handler: mux, ReadHeaderTimeout: 10 * time.Second}
 }
