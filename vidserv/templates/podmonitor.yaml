@@ -1,15 +1,15 @@
-{{- if .Values.prometheusRelease }}
 apiVersion: monitoring.coreos.com/v1
-kind: ServiceMonitor
+kind: PodMonitor
 metadata:
   name: {{ include "vidserv.fullname" . }}
   labels:
     {{- include "vidserv.labels" . | nindent 4 }}
-    release: {{ .Values.prometheusRelease }}
+    release: {{ .Values.prometheus.release }}
 spec:
   selector:
     matchLabels:
       {{- include "vidserv.selectorLabels" . | nindent 6 }}
-  endpoints:
+  podMetricsEndpoints:
   - port: prom-metrics
-{{- end }}
+    path: /metrics
+    interval: {{ .Values.prometheus.scrapeInterval }}

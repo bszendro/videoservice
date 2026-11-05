@@ -11,9 +11,5 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
-    - port: {{ .Values.service.metricsPort }}
-      targetPort: prom-metrics
-      protocol: TCP
-      name: prom-metrics
   selector:
     {{- include "vidserv.selectorLabels" . | nindent 4 }}

@@ -165,4 +165,6 @@ tolerations: []
 
 affinity: {}
 
-prometheusRelease: "prom"
+prometheus:
+  release: prom
+  scrapeInterval: 15s
