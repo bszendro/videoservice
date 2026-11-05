@@ -1,0 +1,27 @@
+site_name: Observability Recipes
+site_url: https://bszendro.github.io/videoservice/
+
+theme:
+  name: material
+  palette:
+    # Toggle between dark and light mode
+    - scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: green
+      accent: green
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+
+nav:
+  - 1. Expose Prometheus metrics from a service: 1-expose-prom-metrics-from-service.md

@@ -1,4 +1,4 @@
 
-## Recipes
+## Documentation
 
-1. [Expose Prometheus metrics from service](docs/recipes/1-expose-prom-metrics-from-service.md)
+1. [Observability Recipes](https://bszendro.github.io/videoservice/)

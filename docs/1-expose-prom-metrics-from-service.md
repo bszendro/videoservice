@@ -1,5 +1,5 @@
 
-# Expose Prometheus metrics from service
+# Expose Prometheus metrics from a service
 
 This recipe shows how the metrics exposed by the service can be scraped by Prometheus and displayed in Grafana deployed inside a Kubernetes cluster.
 
