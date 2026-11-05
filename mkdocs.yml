@@ -24,4 +24,5 @@ theme:
     - search.highlight
 
 nav:
+  - Home: index.md
   - 1. Expose Prometheus metrics from a service: 1-expose-prom-metrics-from-service.md
