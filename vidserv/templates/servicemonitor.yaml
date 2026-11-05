@@ -1,0 +1,15 @@
+{{- if .Values.prometheusRelease }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: {{ include "vidserv.fullname" . }}
+  labels:
+    {{- include "vidserv.labels" . | nindent 4 }}
+    release: {{ .Values.prometheusRelease }}
+spec:
+  selector:
+    matchLabels:
+      {{- include "vidserv.selectorLabels" . | nindent 6 }}
+  endpoints:
+  - port: prom-metrics
+{{- end }}

@@ -17,6 +17,11 @@ import (
 
 func newServer() *http.Server {
 	mux := http.NewServeMux()
+
+	mux.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	})
+
 	mux.HandleFunc("GET /hello", func(w http.ResponseWriter, r *http.Request) {
 		body, err := json.Marshal(struct {
 			World string `json:"world"`

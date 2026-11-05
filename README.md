@@ -2,62 +2,61 @@
 ## Start the cluster
 
 ```bash
-kind create cluster --config kind.yaml
+$ kind create cluster --config kind.yaml
 ```
+
+## Deploy the Prometheus stack
+
+```bash
+$ kubectl create namespace monitoring
+$ helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+$ helm install prom prometheus-community/kube-prometheus-stack --version 92.17.1 -n monitoring
+# Wait until all the pods become ready
+$ helm test prom -n monitoring
+# Get the login password for Grafana
+$ kubectl get secret prom-grafana -n monitoring -o jsonpath="{.data.admin-password}" | base64 --decode; echo
+# Make Grafana accessible over localhost:3000
+$ kubectl port-forward service/prom-grafana -n monitoring 3000:80
+```
+
+* Open [http://localhost:3000/](http://localhost:3000/)
+* Login with admin and the password read from the secret previously
 
 ## Build the image
 
 ```bash
-docker build -t ghcr.io/bszendro/videoservice/videoservice:latest .
-docker push ghcr.io/bszendro/videoservice/videoservice:latest
+$ docker build -t ghcr.io/bszendro/videoservice/videoservice:1.0.0 .
+# Login the first time
+$ docker login ghcr.io -u bszendro
+$ docker push ghcr.io/bszendro/videoservice/videoservice:1.0.0
 ```
 
-## Deploy the image
+## Deploy the image using Helm
 
-> **_NOTE:_** When using a private repository, you need to create the secret in k8s first:
+> **_NOTE:_** When using a private repository on GHCR, create a Personal access token (classic) on GitHub with `write:packages` permissions, then store the secret in k8s. (Note that this secret is not encrypted in the DB by default.)
 > ```bash
-> $ kubectl create secret docker-registry ghcr-access-key \
->       --docker-server=ghcr.io \
->       --docker-username=bszendro \
->       --docker-password=<access-key>
+> $ kubectl create secret docker-registry ghcr-access-key --docker-server=ghcr.io --docker-username=bszendro --docker-password=<access-key>
 >
 > $ kubectl get secret ghcr-access-key
 > ```
 >
 
 ```bash
-kubectl apply -f videoservice-deployment.yaml
-kubectl apply -f videoservice-service.yaml
+$ helm install vidserv ./vidserv --version 1.0.0
+# Wait until all the pods become ready
+$ helm test vidserv
 ```
 
-## Deploy Prometheus using Helm
+Now the metrics exposed by the service should be visible in Grafana's Explore view.
+The way this works is that the Prometheus stack operator detects the `ServiceMonitor` resource created by Helm when deploying the service. The `ServiceMonitor` resource in the chart has a `release` label that matches the value in the `Prometheus` resource:
 
 ```bash
-helm install myprom oci://ghcr.io/prometheus-community/charts/kube-prometheus-stack:92.17.1
+# Check what servicemonitors will this Prometheus instance use
+$ kubectl get prometheus prom-kube-prometheus-stack-prometheus -n monitoring -o json | jq '.spec.serviceMonitorSelector.matchLabels'
+{
+  "release": "prom"
+}
 ```
-
-## Connect to Grafana
-
-```bash
-kubectl port-forward service/myprom-grafana 3000:80
-```
-
-Get the password for `admin`:
-```bash
-kubectl get secret myprom-grafana -o jsonpath="{.data.admin-password}" | base64 --decode; echo
-```
-
-Open [http://localhost:3000/](http://localhost:3000/)
-
-## Add the service to Prometheus targets
-
-```bash
-kubectl apply -f videoservice-smon.yaml
-```
-
-How this works: The `Prometheus` CRD has `release=myprom` in `spec.serviceMonitorSelector.matchLabels` which will make the operator pick up and apply `videoservice-smon.yaml` that has this label.
-
-After this step the exposed metrics of the service should be visible in Grafana.
 
 ## Test network connectivity from another pod inside the cluster
 

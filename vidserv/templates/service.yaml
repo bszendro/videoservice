@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "vidserv.fullname" . }}
+  labels:
+    {{- include "vidserv.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+    - port: {{ .Values.service.metricsPort }}
+      targetPort: prom-metrics
+      protocol: TCP
+      name: prom-metrics
+  selector:
+    {{- include "vidserv.selectorLabels" . | nindent 4 }}
